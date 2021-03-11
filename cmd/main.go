@@ -13,8 +13,10 @@ import (
 )
 
 func main() {
+
 	message.Init()
 	store.Init()
+
 	defer message.Conn().Close()
 	mx := mux.NewRouter()
 	mx.Use(middleware.LogMiddleware, middleware.AuthMiddleware)

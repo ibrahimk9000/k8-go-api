@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"testing"
 )
 
@@ -97,10 +98,7 @@ const (
 )
 
 //ignore enpoint tests for the moment until we restructure them to itegration tests
-func TestParsecontentManagementFlagJSON(t *testing.T) {
-}
 
-/*
 func TestParsecontentManagementFlagJSON(t *testing.T) {
 
 	njson := []byte(contentManagementFlagJSON)
@@ -130,4 +128,3 @@ func TestParsecontentManagementFlagJSON(t *testing.T) {
 		}
 	}
 }
-*/

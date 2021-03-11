@@ -34,15 +34,17 @@ func Init() {
 	var err error
 	conn, err = rabbitmq.NewInstance(MqHost, MqPort, "", "")
 	if err != nil {
-		log.Fatalf("%s", err)
+		log.Println("rabbitmq server not found\n", err)
 	}
 }
 
-func AmqpM(requestid string, url string) string {
+func AmqpM(requestid string, url string) (string, error) {
 
 	publisher, err := rabbitmq.NewQueuePublisher(conn, Exchange)
 	if err != nil {
-		log.Fatalf("%s", err)
+		log.Println("%s", err)
+		return "", err
+
 	}
 
 	defer publisher.Close()
@@ -50,7 +52,9 @@ func AmqpM(requestid string, url string) string {
 	// Start a consumer
 	msgs, ch, err := rabbitmq.NewQueueConsumer(conn, AqueueName, Aexchange, AroutingKey)
 	if err != nil {
-		log.Fatalf("%s", err)
+		log.Println("%s", err)
+		return "", err
+
 	}
 	defer ch.Close()
 
@@ -62,7 +66,7 @@ func AmqpM(requestid string, url string) string {
 	if err != nil {
 		log.Println("PublishMessage", err)
 
-		return ""
+		return "", err
 	}
 
 	var miniourl string
@@ -80,5 +84,5 @@ func AmqpM(requestid string, url string) string {
 
 	log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
 
-	return miniourl
+	return miniourl, nil
 }

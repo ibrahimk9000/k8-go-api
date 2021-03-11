@@ -69,7 +69,11 @@ func Rebuildzip(w http.ResponseWriter, r *http.Request) {
 
 	reqid := r.Header.Get("Request-Id")
 
-	miniourl := message.AmqpM(reqid, url)
+	miniourl, err := message.AmqpM(reqid, url)
+	if err != nil {
+		log.Println(err)
+		utils.ResponseWithError(w, http.StatusInternalServerError, "StatusInternalServerError")
+	}
 
 	buf2, err := store.Getfile(miniourl)
 	if err != nil {

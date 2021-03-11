@@ -52,19 +52,29 @@ func RebuildFile(w http.ResponseWriter, r *http.Request) {
 	url, err := store.St(buf, "originalpdf")
 	if err != nil {
 		log.Println(err)
+		utils.ResponseWithError(w, http.StatusInternalServerError, "StatusInternalServerError")
+		return
+
 	}
+
 	stsince := time.Since(timer)
 
 	reqid := r.Header.Get("Request-Id")
 
 	timer = time.Now()
-	miniourl := message.AmqpM(reqid, url)
+	miniourl, err := message.AmqpM(reqid, url)
+	if err != nil {
+		log.Println(err)
+		utils.ResponseWithError(w, http.StatusInternalServerError, "StatusInternalServerError")
+		return
+	}
 	mqsince := time.Since(timer)
 
 	timer = time.Now()
 	buf2, err := store.Getfile(miniourl)
 	if err != nil {
 		log.Println(err)
+		return
 	}
 	gfsince := time.Since(timer)
 

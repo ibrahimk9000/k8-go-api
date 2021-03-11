@@ -26,7 +26,7 @@ func Init() {
 	var err error
 	cl, err = minio.NewMinioClient(MinioEndpoint, MinioAccessKey, MinioSecretKey, false)
 	if err != nil {
-		log.Println(err)
+		log.Println("minio server not found \n", err)
 	}
 
 }

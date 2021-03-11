@@ -39,6 +39,10 @@ Clone the repo then
 ```
 cd k8-go-api
 go build -o server ./cmd
+
+docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+docker run -p 9000:9000 minio/minio server /data
+
 ./server
 ```
 
