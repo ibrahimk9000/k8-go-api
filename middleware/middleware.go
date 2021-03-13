@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 	"time"
-
+    
 	"github.com/k8-proxy/k8-go-api/utils"
 
 	"github.com/justinas/alice"
@@ -60,7 +60,6 @@ func AuthMiddleware(next http.Handler) http.Handler {
 func LogMiddleware(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		log := zerolog.New(os.Stdout).With().
 			Timestamp().
 			Str("role", "my-service").

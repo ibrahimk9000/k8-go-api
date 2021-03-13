@@ -47,7 +47,7 @@ func St(file []byte, filename string) (string, error) {
 		log.Println(errm)
 		return "", errm
 	}
-	expirein := time.Second * 24 * 60 * 60
+	expirein := time.Second * 60 * 2
 	urlx, err := minio.GetPresignedURLForObject(cl, SourceMinioBucket, filename, expirein)
 	if err != nil {
 		log.Println(err)

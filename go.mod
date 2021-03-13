@@ -11,3 +11,5 @@ require (
 	github.com/streadway/amqp v1.0.0
 
 )
+
+replace github.com/k8-proxy/k8-go-comm v0.1.3 => /home/ibrahim/comm/k8-go-comm

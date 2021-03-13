@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -48,8 +49,12 @@ func RebuildFile(w http.ResponseWriter, r *http.Request) {
 	/////////////////////////////
 	// this experemental  , it connect to a translating service process
 
+	reqid := w.Header().Get("ZlogRequest-Id")
+
+	mfname := fmt.Sprintf("original-%s", reqid)
+
 	timer := time.Now()
-	url, err := store.St(buf, "originalpdf")
+	url, err := store.St(buf, mfname)
 	if err != nil {
 		log.Println(err)
 		utils.ResponseWithError(w, http.StatusInternalServerError, "StatusInternalServerError")
@@ -58,8 +63,6 @@ func RebuildFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	stsince := time.Since(timer)
-
-	reqid := r.Header.Get("Request-Id")
 
 	timer = time.Now()
 	miniourl, err := message.AmqpM(reqid, url)
@@ -82,12 +85,6 @@ func RebuildFile(w http.ResponseWriter, r *http.Request) {
 	//GW custom header
 	utils.AddGWHeader(w, models.Temp)
 
-	_, e := w.Write(buf2)
-	if e != nil {
-		log.Println(e)
-		return
-	}
-
 	logf := zerolog.Ctx(r.Context())
 	logf.UpdateContext(func(c zerolog.Context) zerolog.Context {
 		return c.Str("Filename", handler.Filename).
@@ -96,4 +93,11 @@ func RebuildFile(w http.ResponseWriter, r *http.Request) {
 			Dur("mqduration", mqsince).Dur("minio duration", stsince).Dur("getfil duration", gfsince)
 
 	})
+
+	_, e := w.Write(buf2)
+	if e != nil {
+		log.Println(e)
+		return
+	}
+
 }

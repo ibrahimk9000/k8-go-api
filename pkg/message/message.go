@@ -40,19 +40,24 @@ func Init() {
 
 func AmqpM(requestid string, url string) (string, error) {
 
-	publisher, err := rabbitmq.NewQueuePublisher(conn, Exchange)
+	publisher, err := rabbitmq.NewQueuePublisher(conn, Exchange, amqp.ExchangeDirect)
 	if err != nil {
-		log.Println("%s", err)
+		log.Println(err)
 		return "", err
 
 	}
 
 	defer publisher.Close()
 
+	ctable := amqp.Table{
+		"x-match":    "any",
+		"request-id": requestid,
+	}
+
 	// Start a consumer
-	msgs, ch, err := rabbitmq.NewQueueConsumer(conn, AqueueName, Aexchange, AroutingKey)
+	msgs, ch, err := rabbitmq.NewQueueConsumer(conn, AqueueName, Aexchange, amqp.ExchangeHeaders, AroutingKey, ctable)
 	if err != nil {
-		log.Println("%s", err)
+		log.Println(err)
 		return "", err
 
 	}
@@ -75,14 +80,11 @@ func AmqpM(requestid string, url string) (string, error) {
 
 	go func() {
 		for d := range msgs {
-			log.Printf("Received a message: %s", d.Body)
 			miniourl = string(d.Body)
 			notforever <- true
 		}
 	}()
 	<-notforever
-
-	log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
 
 	return miniourl, nil
 }
